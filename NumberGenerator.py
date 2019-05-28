@@ -20,6 +20,14 @@
 # - 생성 이후에 변환시킬수 있도록 할것.
 
 import random
+from tkinter import *
+from tkinter import messagebox
+import time
+
+window = Tk()
+window.title("주민번호 생성기")
+window.geometry("350x150+835+450")
+window.resizable(False,False)
 
 def yoon(y):
     return y % 4 == 0
@@ -28,15 +36,10 @@ def yoon(y):
 ## 주민번호에선 해당년도의 뒷자리 2자리밖에 나오지않으므로 4의 약수로만 계산함.
 ## 만들고나서 람다식으로도 만들수도 있겠다 싶었는데 if 조건에는 람다가 안들어가는것 같음. 내가 못넣는건가
 
-
 def product_front():
-    months = [4,6,9,11]
-## 일수가 30일까지 있는 달.
-
+    months = [4,6,9,11] ## 일수가 30일까지 있는 달.
     yy = str(random.randrange(0,100)).zfill(2)
-    mm = str(random.randrange(1,13)).zfill(2)
-## 년과 월을 만든다.
-
+    mm = str(random.randrange(1,13)).zfill(2) ## 년과 월을 만든다.
     if int(mm) == 2 and yoon(int(yy)) == True:
         dd = str(random.randrange(1,30))
     elif int(mm) == 2:
@@ -45,15 +48,8 @@ def product_front():
         dd = str(random.randrange(1,31))
     else:
         dd = str(random.randrange(1,32))
-    dd = dd.zfill(2)
-## 윤년을 계산, 윤년일경우이며 2월일경우 1~29일까지
-## 윤년이 아니지만 2월일경우 1~28일까지
-## 윤년이 아니면서 4,6,9,11월일경우 1~30일까지
-## 세가지 모두 아닐경우 1~31일까지.
-## 년 월 일 모두 1자리수일땐 0을 붙여 2자릿수로 만들어준다.
-    return yy + mm + dd
-## 앞 6자리 완성
-
+    dd = dd.zfill(2) ## 년 월 일 모두 1자리수일땐 0을 붙여 2자릿수로 만들어준다.
+    return yy + mm + dd ## 앞 6자리 완성
 
 def product_back():
     sex = str(random.randrange(1,5)) # 주민번호 첫자리
@@ -63,13 +59,10 @@ def product_back():
                                ## 이전에 44를 부여받은 사람은
                                ## 96으로 바뀌었다고함.
     cen = str(random.randrange(0,100)).zfill(2) ## 주민센터 고유번호. 모르므로 그냥 난수.
-    
     order_list = [1,1,1,1,1,1,1,2,2,random.randrange(3,10)]
     order = str(random.choice(order_list)) ## 주민센터에 출생신고된 순서.
-    
     ## 보통은 1이지만, 쌍둥이이거나, 같은동에서 출산이 여러번 일어난 경우
     ## 2가 나오고, 그 이상이 나올때도 있지만 흔하진않으므로 만듬.
-    
     front = product_front()
     cnt,temp = 0,0
     for i in range(2,8):
@@ -78,7 +71,6 @@ def product_back():
     temp += (int(sex)*8)+(int(loc[0])*9)+(int(loc[1])*2)+(int(cen[0])*3)+(int(cen[1])*4)+(int(order)*5)
     last = str(((temp % 11) - 11)%10)
     return sex+loc+cen+order+last
-
     ## 7번째 자리는 주민번호 앞자리와 뒷자리의 6번째 자릿수의 숫자를 
     ##  [{ 11 - {(2(Y1)+3(Y2)+4(M1)+5(M2)+6(D1)+7(D2)+8(sex)+9(loc[0])+2(loc[1])+3(cen[0])+4(cen[1])+5(order)) % 11} } % 10 ]
     ## 해당 공식에 따라 계산된 수라는 것을 구글링해서 찾아냈다.
@@ -90,15 +82,6 @@ def product():
 
 ## 주민번호 생성기.
 ## 생성만 했고 분석은 다음에하자. 2019-04-21
-
-from tkinter import *
-from tkinter import messagebox
-import time
-
-window = Tk()
-window.title("주민번호 생성기")
-window.geometry("350x150+835+450")
-window.resizable(False,False)
 
 def change_text():
     entry.delete(0,14)
@@ -157,6 +140,10 @@ def clicked1():
 
 - 생성을 누르지않은채로 분석을 눌러도 가능.''')
 
+def cover():
+    number = entry.get()
+    label2.configure(text="        가려짐\n        " + number[:8] + "******")
+
 label = Label(window, text="주민번호 생성/분석\n")
 label.grid(row=0,column=0)
 
@@ -170,11 +157,20 @@ entry = Entry(window)
 entry.grid(row=1,column=0)
 
 button = Button(window, text="생성",font="Consolas", command=change_text)
-button.grid(row=3, column=0)
+button.grid(row=2, column=0)
 
 button2 = Button(window, text="분석",font="Consolas", command=analysis)
-button2.grid(row=3,column=1)
+button2.grid(row=2,column=1)
 
 button3 = Button(window, text="도움말",font="Consolas",command=clicked1)
-button3.grid(row=2,column=1)
+button3.grid(row=3,column=1)
+
+button4 = Button(window, text="가리기",font="Consolas",command=cover)
+button4.grid(row=3,column=0)
 window.mainloop()
+
+# 가리기기능을 뒤늦게 추가하면서 완성
+# 사실 크게 어려운기능은 아니었는데, 까먹었었다..
+# 이런거 만들고 다른사람들 코드좀 보면 깨닫는게
+# 내 코드가 스파게티코드인것같다.
+# 나름 주석도 정리하고 하긴했다.
